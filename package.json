@@ -89,6 +89,6 @@
     "npm-utils": "1.11.0",
     "ramda": "0.22.1",
     "semver": "5.3.0",
-    "simple-commit-message": "2.2.1"
+    "simple-commit-message": "github:netcosports/simple-commit-message"
   }
 }
