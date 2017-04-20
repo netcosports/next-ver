@@ -54,16 +54,18 @@ the "patch" number. A commit `feat(something): ...` will increment the
 "minor" number. Finally, a commit with text "BREAKING" anywhere in the message
 or the message body text will increment the "major" number.
 
-When there are multiple numbers, the will be only the highest single digit
+When there are multiple numbers, ~~the will be only the highest single digit
 increment. For example, these 4 commits will increment the "minor" number
-only.
+only.~~ they are summed up.
 
 ```
 fix(this): ...
 fix(that): ...
 feat(log): ...
 feat(server): ...
+fix(log): ...
 ```
+yields 0.2.1
 
 ## Related
 

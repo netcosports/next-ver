@@ -4,7 +4,6 @@ const is = require('check-more-types')
 const increment = require('./increment')
 const debug = require('debug')('next-ver')
 const ggit = require('ggit')
-const computeTopChange = require('largest-semantic-change').topChange
 const parseCommit = require('./parse-commit')
 
 function addSemverInformation (commits) {
@@ -39,11 +38,20 @@ function printCommitsAfterTag (list) {
   debug(JSON.stringify(list, null, 2))
 }
 
+function computeChanges(version, changes) {
+  let new_version = version;
+
+  for (change of changes.reverse()) {
+    new_version = increment(new_version, change)
+  }
+  return new_version;
+}
+
 function computeNextVersion (currentVersionTag) {
   la(is.unemptyString(currentVersionTag),
     'missing current version', currentVersionTag)
 
-  const incrementVersion = increment.bind(null, currentVersionTag)
+  const incrementVersion = computeChanges.bind(null, currentVersionTag)
 
   return ggit.commits.afterLastTag()
     .then(R.tap(printCommitsAfterTag))
@@ -51,8 +59,7 @@ function computeNextVersion (currentVersionTag) {
     .then(onlySemanticCommits)
     .then(R.tap(printFoundSemanticCommits))
     .then(R.map(R.prop('semver')))
-    .then(computeTopChange)
-    .then(R.tap(printChange))
+    .then(R.map(R.prop('type')))
     .then(incrementVersion)
     .then(R.tap(printResult))
 }
