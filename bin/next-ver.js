@@ -25,7 +25,16 @@ function setVersion (newVersion) {
   })
 }
 
+function printVersion (nextVersion) {
+  if (!nextVersion) {
+    console.log('no new version judging by commits')
+    return
+  }
+  console.log('next version should be', nextVersion)
+}
+
 decideStartVersion()
   .then(computeNextVersion)
+  .then(printVersion)
   .then(setVersion)
   .done()

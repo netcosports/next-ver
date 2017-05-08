@@ -42,7 +42,7 @@ function increment (version, type) {
 }
 
 function isSemanticChange (type) {
-  return is.oneOf(['feat', 'fix', 'refactor', 'perf', 'chore', 'revert', 'minor', 'break', 'patch', 'major'], type);
+  return is.oneOf(['feat', 'fix', 'refactor', 'perf', 'chore', 'revert', 'minor', 'break', 'patch', 'major'], type)
 }
 
 function semverType (type) {

@@ -14,23 +14,10 @@ function onlySemanticCommits (commits) {
   return commits.filter(R.prop('semver'))
 }
 
-function printResult (nextVersion) {
-  if (!nextVersion) {
-    console.log('no new version judging by commits')
-    return
-  }
-  console.log('next version should be', nextVersion)
-}
-
 function printFoundSemanticCommits (commits) {
   debug('semantic commits')
   debug(commits)
   la(is.array(commits), 'expected list of commits', commits)
-}
-
-function printChange (feat) {
-  debug('semantic change "%s"', feat)
-  la(is.maybe.string(feat), 'expected change to be a string', feat)
 }
 
 function printCommitsAfterTag (list) {
@@ -38,13 +25,21 @@ function printCommitsAfterTag (list) {
   debug(JSON.stringify(list, null, 2))
 }
 
-function computeChanges(version, changes) {
-  let new_version = version;
+function computeChanges (version, changes) {
+  debug('Current version', version)
+  let newVersion = version
 
-  for (change of changes.reverse()) {
-    new_version = increment(new_version, change)
+  for (let change of changes.reverse()) {
+    newVersion = increment(newVersion, change)
   }
-  return new_version;
+  return newVersion
+}
+
+function getSemanticCommits (currentVersionTag) {
+  return ggit.commits.afterLastTag()
+    .then(R.tap(printCommitsAfterTag))
+    .then(addSemverInformation)
+    .then(onlySemanticCommits)
 }
 
 function computeNextVersion (currentVersionTag) {
@@ -53,15 +48,14 @@ function computeNextVersion (currentVersionTag) {
 
   const incrementVersion = computeChanges.bind(null, currentVersionTag)
 
-  return ggit.commits.afterLastTag()
-    .then(R.tap(printCommitsAfterTag))
-    .then(addSemverInformation)
-    .then(onlySemanticCommits)
+  return getSemanticCommits(currentVersionTag)
     .then(R.tap(printFoundSemanticCommits))
     .then(R.map(R.prop('semver')))
     .then(R.map(R.prop('type')))
     .then(incrementVersion)
-    .then(R.tap(printResult))
 }
 
-module.exports = computeNextVersion
+module.exports = {
+  computeNextVersion,
+  getSemanticCommits
+}
